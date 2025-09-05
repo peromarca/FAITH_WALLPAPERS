@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>FAITH WALLPAPERS - Premium Collection</title>
+   <style>
+      * {
+         margin: 0;
+         padding: 0;
+         box-sizing: border-box;
+      }
+
+      body {
+         font-family: 'Arial', sans-serif;
+         background: linear-gradient(135deg, #0c0c0c 0%, #1a1a1a 50%, #0c0c0c 100%);
+         color: #ffffff;
+         min-height: 100vh;
+         overflow-x: hidden;
+      }
+
+      /* Header */
+      .header {
+         text-align: center;
+         padding: 40px 20px;
+         background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 50%, #ff3838 100%);
+         box-shadow: 0 10px 30px rgba(255, 107, 107, 0.3);
+         position: relative;
+         overflow: hidden;
+      }
+
+      .header::before {
+         content: '';
+         position: absolute;
+         top: 0;
+         left: 0;
+         right: 0;
+         bottom: 0;
+         background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+         opacity: 0.3;
+      }
+
+      .header h1 {
+         font-size: 3.5em;
+         font-weight: bold;
+         text-shadow: 3px 3px 10px rgba(0, 0, 0, 0.7);
+         margin-bottom: 10px;
+         letter-spacing: 3px;
+         position: relative;
+         z-index: 1;
+      }
+
+      .header p {
+         font-size: 1.3em;
+         opacity: 0.9;
+         position: relative;
+         z-index: 1;
+      }
+
+      /* Stats */
+      .stats {
+         text-align: center;
+         padding: 20px;
+         background: rgba(255, 255, 255, 0.05);
+         margin: 20px;
+         border-radius: 15px;
+         backdrop-filter: blur(10px);
+         border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .stats h3 {
+         font-size: 1.5em;
+         margin-bottom: 10px;
+         color: #ff6b6b;
+      }
+
+      .stats p {
+         font-size: 1.1em;
+         opacity: 0.8;
+      }
+
+      /* Gallery Container */
+      .gallery-container {
+         padding: 40px 20px;
+         max-width: 1400px;
+         margin: 0 auto;
+      }
+
+      /* Filter Controls */
+      .filter-controls {
+         text-align: center;
+         margin-bottom: 40px;
+      }
+
+      .filter-btn {
+         background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+         color: white;
+         border: none;
+         padding: 12px 25px;
+         margin: 5px;
+         border-radius: 25px;
+         cursor: pointer;
+         font-size: 14px;
+         font-weight: bold;
+         transition: all 0.3s ease;
+         box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
+      }
+
+      .filter-btn:hover {
+         transform: translateY(-2px);
+         box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+      }
+
+      .filter-btn.active {
+         background: linear-gradient(135deg, #2ed573, #1e90ff);
+         box-shadow: 0 5px 15px rgba(46, 213, 115, 0.3);
+      }
+
+      /* Gallery Grid */
+      .gallery {
+         display: grid;
+         grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+         gap: 25px;
+         padding: 20px 0;
+      }
+
+      .gallery-item {
+         position: relative;
+         background: rgba(255, 255, 255, 0.05);
+         border-radius: 15px;
+         overflow: hidden;
+         transition: all 0.4s ease;
+         border: 1px solid rgba(255, 255, 255, 0.1);
+         backdrop-filter: blur(10px);
+         cursor: pointer;
+      }
+
+      .gallery-item:hover {
+         transform: translateY(-10px) scale(1.02);
+         box-shadow: 0 20px 40px rgba(255, 107, 107, 0.3);
+         border-color: #ff6b6b;
+      }
+
+      .gallery-item img {
+         width: 100%;
+         height: 250px;
+         object-fit: cover;
+         transition: transform 0.4s ease;
+      }
+
+      .gallery-item:hover img {
+         transform: scale(1.1);
+      }
+
+      .gallery-item-info {
+         padding: 15px;
+         text-align: center;
+      }
+
+      .gallery-item-info h3 {
+         font-size: 1.2em;
+         margin-bottom: 8px;
+         color: #ff6b6b;
+      }
+
+      .gallery-item-info p {
+         opacity: 0.7;
+         font-size: 0.9em;
+      }
+
+      .download-btn {
+         background: linear-gradient(135deg, #2ed573, #1e90ff);
+         color: white;
+         border: none;
+         padding: 10px 20px;
+         border-radius: 20px;
+         cursor: pointer;
+         font-weight: bold;
+         margin-top: 10px;
+         transition: all 0.3s ease;
+         box-shadow: 0 5px 15px rgba(46, 213, 115, 0.3);
+      }
+
+      .download-btn:hover {
+         transform: translateY(-2px);
+         box-shadow: 0 8px 25px rgba(46, 213, 115, 0.4);
+      }
+
+      /* Modal */
+      .modal {
+         display: none;
+         position: fixed;
+         z-index: 1000;
+         left: 0;
+         top: 0;
+         width: 100%;
+         height: 100%;
+         background: rgba(0, 0, 0, 0.95);
+         backdrop-filter: blur(10px);
+      }
+
+      .modal-content {
+         position: relative;
+         margin: auto;
+         padding: 20px;
+         width: 90%;
+         max-width: 1000px;
+         height: 100%;
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         flex-direction: column;
+      }
+
+      .modal img {
+         max-width: 100%;
+         max-height: 80vh;
+         border-radius: 15px;
+         box-shadow: 0 20px 60px rgba(255, 107, 107, 0.5);
+      }
+
+      .modal-info {
+         text-align: center;
+         margin-top: 20px;
+         color: white;
+      }
+
+      .modal-info h2 {
+         font-size: 2em;
+         margin-bottom: 10px;
+         color: #ff6b6b;
+      }
+
+      .modal-controls {
+         display: flex;
+         gap: 15px;
+         margin-top: 20px;
+         flex-wrap: wrap;
+         justify-content: center;
+      }
+
+      .modal-btn {
+         background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+         color: white;
+         border: none;
+         padding: 12px 25px;
+         border-radius: 25px;
+         cursor: pointer;
+         font-weight: bold;
+         transition: all 0.3s ease;
+         box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
+      }
+
+      .modal-btn:hover {
+         transform: translateY(-2px);
+         box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+      }
+
+      .modal-btn.download {
+         background: linear-gradient(135deg, #2ed573, #1e90ff);
+         box-shadow: 0 5px 15px rgba(46, 213, 115, 0.3);
+      }
+
+      .modal-btn.download:hover {
+         box-shadow: 0 8px 25px rgba(46, 213, 115, 0.4);
+      }
+
+      .close {
+         position: absolute;
+         top: 20px;
+         right: 30px;
+         color: #fff;
+         font-size: 40px;
+         font-weight: bold;
+         cursor: pointer;
+         z-index: 1001;
+         transition: all 0.3s ease;
+      }
+
+      .close:hover {
+         color: #ff6b6b;
+         transform: scale(1.2);
+      }
+
+      /* Navigation arrows */
+      .nav-arrow {
+         position: absolute;
+         top: 50%;
+         transform: translateY(-50%);
+         background: rgba(255, 107, 107, 0.8);
+         color: white;
+         border: none;
+         width: 60px;
+         height: 60px;
+         border-radius: 50%;
+         font-size: 24px;
+         cursor: pointer;
+         transition: all 0.3s ease;
+         z-index: 1001;
+      }
+
+      .nav-arrow:hover {
+         background: rgba(255, 107, 107, 1);
+         transform: translateY(-50%) scale(1.1);
+      }
+
+      .nav-arrow.prev {
+         left: 30px;
+      }
+
+      .nav-arrow.next {
+         right: 30px;
+      }
+
+      /* Loading Animation */
+      .loading {
+         text-align: center;
+         padding: 50px;
+         font-size: 1.2em;
+         color: #ff6b6b;
+      }
+
+      .loading::after {
+         content: '';
+         display: inline-block;
+         width: 20px;
+         height: 20px;
+         border: 3px solid rgba(255, 107, 107, 0.3);
+         border-radius: 50%;
+         border-top-color: #ff6b6b;
+         animation: spin 1s ease-in-out infinite;
+         margin-left: 10px;
+      }
+
+      @keyframes spin {
+         to {
+            transform: rotate(360deg);
+         }
+      }
+
+      /* Responsive Design */
+      @media (max-width: 768px) {
+         .header h1 {
+            font-size: 2.5em;
+         }
+
+         .gallery {
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+         }
+
+         .modal-content {
+            padding: 10px;
+         }
+
+         .nav-arrow {
+            width: 50px;
+            height: 50px;
+            font-size: 20px;
+         }
+
+         .nav-arrow.prev {
+            left: 15px;
+         }
+
+         .nav-arrow.next {
+            right: 15px;
+         }
+
+         .modal-controls {
+            flex-direction: column;
+            align-items: center;
+         }
+      }
+
+      /* Scroll to top button */
+      .scroll-top {
+         position: fixed;
+         bottom: 30px;
+         right: 30px;
+         background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+         color: white;
+         border: none;
+         width: 60px;
+         height: 60px;
+         border-radius: 50%;
+         font-size: 24px;
+         cursor: pointer;
+         display: none;
+         transition: all 0.3s ease;
+         box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
+         z-index: 100;
+      }
+
+      .scroll-top:hover {
+         transform: translateY(-5px);
+         box-shadow: 0 10px 25px rgba(255, 107, 107, 0.4);
+      }
+
+      .scroll-top.show {
+         display: block;
+         animation: fadeInUp 0.5s ease;
+      }
+
+      @keyframes fadeInUp {
+         from {
+            opacity: 0;
+            transform: translateY(30px);
+         }
+
+         to {
+            opacity: 1;
+            transform: translateY(0);
+         }
+      }
+   </style>
+</head>
+
+<body>
+   <!-- Header -->
+   <header class="header">
+      <h1>🔥 FAITH WALLPAPERS</h1>
+      <p>Premium Collection of High-Quality Wallpapers</p>
+   </header>
+
+   <!-- Stats -->
+   <div class="stats">
+      <h3>📊 Collection Stats</h3>
+      <p id="totalImages">Loading awesome wallpapers...</p>
+   </div>
+
+   <!-- Gallery Container -->
+   <div class="gallery-container">
+      <!-- Filter Controls -->
+      <div class="filter-controls">
+         <button class="filter-btn active" data-filter="all">🔥 All Wallpapers</button>
+         <button class="filter-btn" data-filter="numbered">🔢 Numbered Series</button>
+         <button class="filter-btn" data-filter="wp">✨ WP Collection</button>
+      </div>
+
+      <!-- Loading -->
+      <div class="loading" id="loading">Loading amazing wallpapers</div>
+
+      <!-- Gallery -->
+      <div class="gallery" id="gallery"></div>
+   </div>
+
+   <!-- Modal -->
+   <div id="imageModal" class="modal">
+      <div class="modal-content">
+         <span class="close">&times;</span>
+         <button class="nav-arrow prev" id="prevBtn">‹</button>
+         <button class="nav-arrow next" id="nextBtn">›</button>
+         <img id="modalImage" src="" alt="">
+         <div class="modal-info">
+            <h2 id="modalTitle"></h2>
+            <div class="modal-controls">
+               <button class="modal-btn download" id="downloadBtn">⬇️ Download</button>
+               <button class="modal-btn" id="viewFullBtn">🖼️ View Full Size</button>
+               <button class="modal-btn" id="shareBtn">📤 Share</button>
+            </div>
+         </div>
+      </div>
+   </div>
+
+   <!-- Scroll to top -->
+   <button class="scroll-top" id="scrollTop">↑</button>
+
+   <script>
+      // Image data
+      const images = [
+         // Numbered series
+         '1.png', '2.png', '3.png', '4.png', '5.png', '6.png', '7.png', '8.png', '9.png', '10.png', '11.png',
+
+         // WP series
+         'wp1.png', 'wp2.png', 'wp3.png', 'wp4.png', 'wp5.png', 'wp6.png', 'wp7.png', 'wp8.png', 'wp9.png', 'wp10.png',
+         'wp11.png', 'wp12.png', 'wp13.png', 'wp14.png', 'wp15.png', 'wp16.png', 'wp17.png', 'wp18.png', 'wp19.png', 'wp20.png',
+         'wp21.png', 'wp22.png', 'wp23.png', 'wp24.png', 'wp25.png', 'wp26.png', 'wp27.png', 'wp28.png', 'wp29.png', 'wp30.png',
+         'wp31.png', 'wp32.png', 'wp33.png', 'wp34.png', 'wp35.png', 'wp36.png', 'wp37.png', 'wp38.png', 'wp39.png', 'wp40.png',
+         'wp41.png', 'wp42.png', 'wp43.png', 'wp44.png', 'wp45.png', 'wp46.png', 'wp47.png', 'wp48.png', 'wp49.png', 'wp50.png',
+         'wp51.png', 'wp52.png', 'wp53.png', 'wp54.png', 'wp55.png', 'wp56.png', 'wp57.png', 'wp58.png', 'wp59.png', 'wp60.png',
+         'wp61.png', 'wp62.png', 'wp63.png', 'wp64.png', 'wp65.png', 'wp66.png', 'wp67.png'
+      ];
+
+      let currentImages = [...images];
+      let currentImageIndex = 0;
+
+      // DOM elements
+      const gallery = document.getElementById('gallery');
+      const loading = document.getElementById('loading');
+      const modal = document.getElementById('imageModal');
+      const modalImage = document.getElementById('modalImage');
+      const modalTitle = document.getElementById('modalTitle');
+      const closeBtn = document.querySelector('.close');
+      const downloadBtn = document.getElementById('downloadBtn');
+      const viewFullBtn = document.getElementById('viewFullBtn');
+      const shareBtn = document.getElementById('shareBtn');
+      const prevBtn = document.getElementById('prevBtn');
+      const nextBtn = document.getElementById('nextBtn');
+      const scrollTopBtn = document.getElementById('scrollTop');
+      const totalImagesEl = document.getElementById('totalImages');
+
+      // Initialize
+      document.addEventListener('DOMContentLoaded', function () {
+         loadGallery();
+         setupEventListeners();
+         updateStats();
+      });
+
+      function updateStats() {
+         totalImagesEl.textContent = `🎨 ${images.length} Premium Wallpapers Available for Download`;
+      }
+
+      function loadGallery() {
+         loading.style.display = 'block';
+         gallery.innerHTML = '';
+
+         setTimeout(() => {
+            currentImages.forEach((image, index) => {
+               const galleryItem = createGalleryItem(image, index);
+               gallery.appendChild(galleryItem);
+            });
+
+            loading.style.display = 'none';
+
+            // Add entrance animation
+            const items = document.querySelectorAll('.gallery-item');
+            items.forEach((item, index) => {
+               setTimeout(() => {
+                  item.style.opacity = '0';
+                  item.style.transform = 'translateY(30px)';
+                  item.style.transition = 'all 0.5s ease';
+                  setTimeout(() => {
+                     item.style.opacity = '1';
+                     item.style.transform = 'translateY(0)';
+                  }, 50);
+               }, index * 50);
+            });
+         }, 500);
+      }
+
+      function createGalleryItem(imageName, index) {
+         const item = document.createElement('div');
+         item.className = 'gallery-item';
+         item.dataset.category = getCategory(imageName);
+
+         const imageTitle = formatImageName(imageName);
+         const imagePath = `images/FAITH PNG/${imageName}`;
+
+         item.innerHTML = `
+                <img src="${imagePath}" alt="${imageTitle}" loading="lazy">
+                <div class="gallery-item-info">
+                    <h3>${imageTitle}</h3>
+                    <p>High Quality PNG • Ready to Download</p>
+                    <button class="download-btn" onclick="downloadImage('${imagePath}', '${imageName}')">
+                        ⬇️ Download
+                    </button>
+                </div>
+            `;
+
+         // Open modal on click
+         item.addEventListener('click', (e) => {
+            if (!e.target.classList.contains('download-btn')) {
+               openModal(index);
+            }
+         });
+
+         return item;
+      }
+
+      function getCategory(imageName) {
+         if (imageName.startsWith('wp')) return 'wp';
+         if (/^\d+\.png$/.test(imageName)) return 'numbered';
+         return 'other';
+      }
+
+      function formatImageName(imageName) {
+         const name = imageName.replace('.png', '');
+         if (name.startsWith('wp')) {
+            const num = name.replace('wp', '');
+            return `FAITH WP #${num}`;
+         } else if (/^\d+$/.test(name)) {
+            return `FAITH Wallpaper #${name}`;
+         }
+         return `FAITH ${name}`;
+      }
+
+      function setupEventListeners() {
+         // Filter buttons
+         document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+               // Update active button
+               document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+               e.target.classList.add('active');
+
+               // Filter images
+               const filter = e.target.dataset.filter;
+               filterImages(filter);
+            });
+         });
+
+         // Modal controls
+         closeBtn.addEventListener('click', closeModal);
+         modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeModal();
+         });
+
+         downloadBtn.addEventListener('click', () => {
+            const currentImage = currentImages[currentImageIndex];
+            downloadImage(`images/FAITH PNG/${currentImage}`, currentImage);
+         });
+
+         viewFullBtn.addEventListener('click', () => {
+            const currentImage = currentImages[currentImageIndex];
+            window.open(`images/FAITH PNG/${currentImage}`, '_blank');
+         });
+
+         shareBtn.addEventListener('click', () => {
+            if (navigator.share) {
+               const currentImage = currentImages[currentImageIndex];
+               navigator.share({
+                  title: formatImageName(currentImage),
+                  text: 'Check out this amazing FAITH wallpaper!',
+                  url: window.location.href
+               });
+            } else {
+               // Fallback - copy URL to clipboard
+               navigator.clipboard.writeText(window.location.href);
+               alert('Link copied to clipboard!');
+            }
+         });
+
+         prevBtn.addEventListener('click', showPrevImage);
+         nextBtn.addEventListener('click', showNextImage);
+
+         // Keyboard navigation
+         document.addEventListener('keydown', (e) => {
+            if (modal.style.display === 'block') {
+               if (e.key === 'Escape') closeModal();
+               if (e.key === 'ArrowLeft') showPrevImage();
+               if (e.key === 'ArrowRight') showNextImage();
+            }
+         });
+
+         // Scroll to top
+         window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+               scrollTopBtn.classList.add('show');
+            } else {
+               scrollTopBtn.classList.remove('show');
+            }
+         });
+
+         scrollTopBtn.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+         });
+      }
+
+      function filterImages(filter) {
+         if (filter === 'all') {
+            currentImages = [...images];
+         } else {
+            currentImages = images.filter(img => getCategory(img) === filter);
+         }
+         loadGallery();
+      }
+
+      function openModal(index) {
+         currentImageIndex = index;
+         const imageName = currentImages[index];
+         const imagePath = `images/FAITH PNG/${imageName}`;
+
+         modalImage.src = imagePath;
+         modalTitle.textContent = formatImageName(imageName);
+         modal.style.display = 'block';
+         document.body.style.overflow = 'hidden';
+
+         // Update navigation buttons
+         prevBtn.style.display = index > 0 ? 'block' : 'none';
+         nextBtn.style.display = index < currentImages.length - 1 ? 'block' : 'none';
+      }
+
+      function closeModal() {
+         modal.style.display = 'none';
+         document.body.style.overflow = 'auto';
+      }
+
+      function showPrevImage() {
+         if (currentImageIndex > 0) {
+            openModal(currentImageIndex - 1);
+         }
+      }
+
+      function showNextImage() {
+         if (currentImageIndex < currentImages.length - 1) {
+            openModal(currentImageIndex + 1);
+         }
+      }
+
+      function downloadImage(imagePath, imageName) {
+         const link = document.createElement('a');
+         link.href = imagePath;
+         link.download = imageName;
+         link.target = '_blank';
+         document.body.appendChild(link);
+         link.click();
+         document.body.removeChild(link);
+
+         // Show download notification
+         showNotification(`📁 ${formatImageName(imageName)} downloaded!`);
+      }
+
+      function showNotification(message) {
+         const notification = document.createElement('div');
+         notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: linear-gradient(135deg, #2ed573, #1e90ff);
+                color: white;
+                padding: 15px 25px;
+                border-radius: 10px;
+                box-shadow: 0 10px 30px rgba(46, 213, 115, 0.3);
+                z-index: 10000;
+                font-weight: bold;
+                animation: slideInRight 0.5s ease;
+            `;
+         notification.textContent = message;
+
+         document.body.appendChild(notification);
+
+         setTimeout(() => {
+            notification.style.animation = 'slideOutRight 0.5s ease';
+            setTimeout(() => {
+               document.body.removeChild(notification);
+            }, 500);
+         }, 3000);
+      }
+
+      // Add CSS for notification animations
+      const style = document.createElement('style');
+      style.textContent = `
+            @keyframes slideInRight {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOutRight {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+      document.head.appendChild(style);
+   </script>
+</body>
+
+</html>
