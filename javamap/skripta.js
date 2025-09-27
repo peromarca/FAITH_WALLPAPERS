@@ -14,6 +14,8 @@ const images = [
 
 let currentImages = [...images];
 let currentImageIndex = 0;
+let currentPage = 1;
+const imagesPerPage = 20; // Load 20 images at a time
 
 // DOM elements
 const gallery = document.getElementById('gallery');
@@ -45,28 +47,69 @@ function loadGallery() {
    loading.style.display = 'block';
    gallery.innerHTML = '';
 
-   setTimeout(() => {
-      currentImages.forEach((image, index) => {
-         const galleryItem = createGalleryItem(image, index);
-         gallery.appendChild(galleryItem);
-      });
+   // Load only first batch of images for faster initial load
+   const startIndex = 0;
+   const endIndex = Math.min(imagesPerPage, currentImages.length);
+   const imagesToLoad = currentImages.slice(startIndex, endIndex);
 
-      loading.style.display = 'none';
+   imagesToLoad.forEach((image, index) => {
+      const galleryItem = createGalleryItem(image, index);
+      gallery.appendChild(galleryItem);
+   });
 
-      // Add entrance animation
-      const items = document.querySelectorAll('.gallery-item');
-      items.forEach((item, index) => {
-         setTimeout(() => {
-            item.style.opacity = '0';
-            item.style.transform = 'translateY(30px)';
-            item.style.transition = 'all 0.5s ease';
-            setTimeout(() => {
-               item.style.opacity = '1';
-               item.style.transform = 'translateY(0)';
-            }, 50);
-         }, index * 50);
-      });
-   }, 500);
+   loading.style.display = 'none';
+
+   // Add "Load More" button if there are more images
+   if (endIndex < currentImages.length) {
+      addLoadMoreButton();
+   }
+
+   // Add entrance animation (optional - can be removed for even faster loading)
+   const items = document.querySelectorAll('.gallery-item');
+   items.forEach((item, index) => {
+      item.style.opacity = '0';
+      item.style.transform = 'translateY(30px)';
+      item.style.transition = 'all 0.5s ease';
+      setTimeout(() => {
+         item.style.opacity = '1';
+         item.style.transform = 'translateY(0)';
+      }, index * 20); // Reduced from 50ms to 20ms
+   });
+}
+
+function addLoadMoreButton() {
+   const loadMoreBtn = document.createElement('div');
+   loadMoreBtn.className = 'load-more-container';
+   loadMoreBtn.innerHTML = `
+      <button class="load-more-btn" onclick="loadMoreImages()">
+         📁 Load More Wallpapers (${currentImages.length - (currentPage * imagesPerPage)} remaining)
+      </button>
+   `;
+   gallery.appendChild(loadMoreBtn);
+}
+
+function loadMoreImages() {
+   const startIndex = currentPage * imagesPerPage;
+   const endIndex = Math.min(startIndex + imagesPerPage, currentImages.length);
+   const imagesToLoad = currentImages.slice(startIndex, endIndex);
+
+   // Remove load more button
+   const loadMoreContainer = document.querySelector('.load-more-container');
+   if (loadMoreContainer) {
+      loadMoreContainer.remove();
+   }
+
+   imagesToLoad.forEach((image, index) => {
+      const galleryItem = createGalleryItem(image, startIndex + index);
+      gallery.appendChild(galleryItem);
+   });
+
+   currentPage++;
+
+   // Add new load more button if needed
+   if (endIndex < currentImages.length) {
+      addLoadMoreButton();
+   }
 }
 
 function createGalleryItem(imageName, index) {
@@ -78,7 +121,7 @@ function createGalleryItem(imageName, index) {
    const imagePath = `images/FAITH PNG/${imageName}`;
 
    item.innerHTML = `
-                <img src="${imagePath}" alt="${imageTitle}" loading="lazy">
+                <img src="${imagePath}" alt="${imageTitle}" loading="lazy" decoding="async">
                 <div class="gallery-item-info">
                     <h3>${imageTitle}</h3>
                     <p>High Quality PNG • Ready to Download</p>
@@ -192,6 +235,7 @@ function filterImages(filter) {
    } else {
       currentImages = images.filter(img => getCategory(img) === filter);
    }
+   currentPage = 1; // Reset pagination
    loadGallery();
 }
 

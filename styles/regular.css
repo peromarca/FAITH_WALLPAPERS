@@ -406,3 +406,29 @@
        transform: translateY(0);
     }
  }
+
+ /* Load More Button */
+ .load-more-container {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 40px 20px;
+ }
+
+ .load-more-btn {
+    background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
+ }
+
+ .load-more-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+    background: linear-gradient(135deg, #ee5a24, #ff3838);
+ }
