@@ -34,9 +34,9 @@ const totalImagesEl = document.getElementById('totalImages');
 
 // Initialize
 document.addEventListener('DOMContentLoaded', function () {
-   updateStats();         // Prvo pokaži brojač
-   setupEventListeners(); // Postaviti kontrole
-   loadGallery();         // Na kraju učitaj galeriju (najsporije)
+   loadGallery();
+   setupEventListeners();
+   updateStats();
 });
 
 function updateStats() {
@@ -52,25 +52,29 @@ function loadGallery() {
    const endIndex = Math.min(imagesPerPage, currentImages.length);
    const imagesToLoad = currentImages.slice(startIndex, endIndex);
 
-   // Load images one by one with small delay for smoother experience
    imagesToLoad.forEach((image, index) => {
-      setTimeout(() => {
-         const galleryItem = createGalleryItem(image, index);
-         gallery.appendChild(galleryItem);
-
-         // Hide loading when first few images are loaded
-         if (index === 4) { // Hide loading after 5 images
-            loading.style.display = 'none';
-         }
-      }, index * 30); // 30ms delay between each image
+      const galleryItem = createGalleryItem(image, index);
+      gallery.appendChild(galleryItem);
    });
 
-   // Add "Load More" button after all initial images are loaded
-   setTimeout(() => {
-      if (endIndex < currentImages.length) {
-         addLoadMoreButton();
-      }
-   }, imagesToLoad.length * 30 + 100);
+   loading.style.display = 'none';
+
+   // Add "Load More" button if there are more images
+   if (endIndex < currentImages.length) {
+      addLoadMoreButton();
+   }
+
+   // Add entrance animation (optional - can be removed for even faster loading)
+   const items = document.querySelectorAll('.gallery-item');
+   items.forEach((item, index) => {
+      item.style.opacity = '0';
+      item.style.transform = 'translateY(30px)';
+      item.style.transition = 'all 0.5s ease';
+      setTimeout(() => {
+         item.style.opacity = '1';
+         item.style.transform = 'translateY(0)';
+      }, index * 20); // Reduced from 50ms to 20ms
+   });
 }
 
 function addLoadMoreButton() {
