@@ -1,3 +1,4 @@
+// FAST LOADING VERSION - All 100 images at once
 const images = [
    // WP series - updated to match current file names
    'wp 01.png', 'wp 02.png', 'wp 03.png', 'wp 04.png', 'wp 05.png', 'wp 06.png', 'wp 07.png', 'wp 08.png', 'wp 09.png', 'wp 10.png',
@@ -14,8 +15,6 @@ const images = [
 
 let currentImages = [...images];
 let currentImageIndex = 0;
-let currentPage = 1;
-const imagesPerPage = 20; // Load 20 images at a time
 
 // DOM elements
 const gallery = document.getElementById('gallery');
@@ -32,84 +31,41 @@ const nextBtn = document.getElementById('nextBtn');
 const scrollTopBtn = document.getElementById('scrollTop');
 const totalImagesEl = document.getElementById('totalImages');
 
-// Initialize
+// Initialize - FAST VERSION
 document.addEventListener('DOMContentLoaded', function () {
-   loadGallery();
-   setupEventListeners();
    updateStats();
+   setupEventListeners();
+   loadGalleryFast(); // Load all images immediately
 });
 
 function updateStats() {
    totalImagesEl.textContent = `🎨 ${images.length} Premium Wallpapers Available for Download`;
 }
 
-function loadGallery() {
+// FAST LOADING FUNCTION - Load all 100 images at once
+function loadGalleryFast() {
    loading.style.display = 'block';
+
+   // Clear gallery
    gallery.innerHTML = '';
 
-   // Load only first batch of images for faster initial load
-   const startIndex = 0;
-   const endIndex = Math.min(imagesPerPage, currentImages.length);
-   const imagesToLoad = currentImages.slice(startIndex, endIndex);
+   // Create document fragment for better performance
+   const fragment = document.createDocumentFragment();
 
-   imagesToLoad.forEach((image, index) => {
+   // Create all gallery items at once
+   currentImages.forEach((image, index) => {
       const galleryItem = createGalleryItem(image, index);
-      gallery.appendChild(galleryItem);
+      fragment.appendChild(galleryItem);
    });
 
+   // Add all items to gallery at once (faster than individual appends)
+   gallery.appendChild(fragment);
+
+   // Hide loading immediately
    loading.style.display = 'none';
 
-   // Add "Load More" button if there are more images
-   if (endIndex < currentImages.length) {
-      addLoadMoreButton();
-   }
-
-   // Add entrance animation (optional - can be removed for even faster loading)
-   const items = document.querySelectorAll('.gallery-item');
-   items.forEach((item, index) => {
-      item.style.opacity = '0';
-      item.style.transform = 'translateY(30px)';
-      item.style.transition = 'all 0.5s ease';
-      setTimeout(() => {
-         item.style.opacity = '1';
-         item.style.transform = 'translateY(0)';
-      }, index * 20); // Reduced from 50ms to 20ms
-   });
-}
-
-function addLoadMoreButton() {
-   const loadMoreBtn = document.createElement('div');
-   loadMoreBtn.className = 'load-more-container';
-   loadMoreBtn.innerHTML = `
-      <button class="load-more-btn" onclick="loadMoreImages()">
-         📁 Load More Wallpapers (${currentImages.length - (currentPage * imagesPerPage)} remaining)
-      </button>
-   `;
-   gallery.appendChild(loadMoreBtn);
-}
-
-function loadMoreImages() {
-   const startIndex = currentPage * imagesPerPage;
-   const endIndex = Math.min(startIndex + imagesPerPage, currentImages.length);
-   const imagesToLoad = currentImages.slice(startIndex, endIndex);
-
-   // Remove load more button
-   const loadMoreContainer = document.querySelector('.load-more-container');
-   if (loadMoreContainer) {
-      loadMoreContainer.remove();
-   }
-
-   imagesToLoad.forEach((image, index) => {
-      const galleryItem = createGalleryItem(image, startIndex + index);
-      gallery.appendChild(galleryItem);
-   });
-
-   currentPage++;
-
-   // Add new load more button if needed
-   if (endIndex < currentImages.length) {
-      addLoadMoreButton();
-   }
+   // No animations for maximum speed
+   console.log(`✅ Fast loading complete: ${currentImages.length} images loaded`);
 }
 
 function createGalleryItem(imageName, index) {
@@ -120,16 +76,17 @@ function createGalleryItem(imageName, index) {
    const imageTitle = formatImageName(imageName);
    const imagePath = `images/FAITH PNG/${imageName}`;
 
+   // Minimal HTML for speed
    item.innerHTML = `
-                <img src="${imagePath}" alt="${imageTitle}" loading="lazy" decoding="async">
-                <div class="gallery-item-info">
-                    <h3>${imageTitle}</h3>
-                    <p>High Quality PNG • Ready to Download</p>
-                    <button class="download-btn" onclick="downloadImage('${imagePath}', '${imageName}')">
-                        ⬇️ Download
-                    </button>
-                </div>
-            `;
+       <img src="${imagePath}" alt="${imageTitle}" loading="lazy" decoding="async">
+       <div class="gallery-item-info">
+           <h3>${imageTitle}</h3>
+           <p>High Quality PNG • Ready to Download</p>
+           <button class="download-btn" onclick="downloadImage('${imagePath}', '${imageName}')">
+               ⬇️ Download
+           </button>
+       </div>
+   `;
 
    // Open modal on click
    item.addEventListener('click', (e) => {
@@ -150,7 +107,7 @@ function getCategory(imageName) {
 function formatImageName(imageName) {
    const name = imageName.replace('.png', '');
    if (name.startsWith('wp')) {
-      const num = name.replace('wp', '');
+      const num = name.replace('wp ', '');
       return `FAITH WP #${num}`;
    } else if (/^\d+$/.test(name)) {
       return `FAITH Wallpaper #${name}`;
@@ -162,53 +119,66 @@ function setupEventListeners() {
    // Filter buttons
    document.querySelectorAll('.filter-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
+         // Skip if it's the game button
+         if (e.target.classList.contains('game-btn')) return;
+
          // Update active button
          document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
          e.target.classList.add('active');
 
          // Filter images
          const filter = e.target.dataset.filter;
-         filterImages(filter);
+         if (filter) {
+            filterImages(filter);
+         }
       });
    });
 
    // Modal controls
-   closeBtn.addEventListener('click', closeModal);
-   modal.addEventListener('click', (e) => {
-      if (e.target === modal) closeModal();
-   });
+   if (closeBtn) closeBtn.addEventListener('click', closeModal);
+   if (modal) {
+      modal.addEventListener('click', (e) => {
+         if (e.target === modal) closeModal();
+      });
+   }
 
-   downloadBtn.addEventListener('click', () => {
-      const currentImage = currentImages[currentImageIndex];
-      downloadImage(`images/FAITH PNG/${currentImage}`, currentImage);
-   });
-
-   viewFullBtn.addEventListener('click', () => {
-      const currentImage = currentImages[currentImageIndex];
-      window.open(`images/FAITH PNG/${currentImage}`, '_blank');
-   });
-
-   shareBtn.addEventListener('click', () => {
-      if (navigator.share) {
+   if (downloadBtn) {
+      downloadBtn.addEventListener('click', () => {
          const currentImage = currentImages[currentImageIndex];
-         navigator.share({
-            title: formatImageName(currentImage),
-            text: 'Check out this amazing FAITH wallpaper!',
-            url: window.location.href
-         });
-      } else {
-         // Fallback - copy URL to clipboard
-         navigator.clipboard.writeText(window.location.href);
-         alert('Link copied to clipboard!');
-      }
-   });
+         downloadImage(`images/FAITH PNG/${currentImage}`, currentImage);
+      });
+   }
 
-   prevBtn.addEventListener('click', showPrevImage);
-   nextBtn.addEventListener('click', showNextImage);
+   if (viewFullBtn) {
+      viewFullBtn.addEventListener('click', () => {
+         const currentImage = currentImages[currentImageIndex];
+         window.open(`images/FAITH PNG/${currentImage}`, '_blank');
+      });
+   }
+
+   if (shareBtn) {
+      shareBtn.addEventListener('click', () => {
+         if (navigator.share) {
+            const currentImage = currentImages[currentImageIndex];
+            navigator.share({
+               title: formatImageName(currentImage),
+               text: 'Check out this amazing FAITH wallpaper!',
+               url: window.location.href
+            });
+         } else {
+            // Fallback - copy URL to clipboard
+            navigator.clipboard.writeText(window.location.href);
+            alert('Link copied to clipboard!');
+         }
+      });
+   }
+
+   if (prevBtn) prevBtn.addEventListener('click', showPrevImage);
+   if (nextBtn) nextBtn.addEventListener('click', showNextImage);
 
    // Keyboard navigation
    document.addEventListener('keydown', (e) => {
-      if (modal.style.display === 'block') {
+      if (modal && modal.style.display === 'block') {
          if (e.key === 'Escape') closeModal();
          if (e.key === 'ArrowLeft') showPrevImage();
          if (e.key === 'ArrowRight') showNextImage();
@@ -216,17 +186,19 @@ function setupEventListeners() {
    });
 
    // Scroll to top
-   window.addEventListener('scroll', () => {
-      if (window.pageYOffset > 300) {
-         scrollTopBtn.classList.add('show');
-      } else {
-         scrollTopBtn.classList.remove('show');
-      }
-   });
+   if (scrollTopBtn) {
+      window.addEventListener('scroll', () => {
+         if (window.pageYOffset > 300) {
+            scrollTopBtn.classList.add('show');
+         } else {
+            scrollTopBtn.classList.remove('show');
+         }
+      });
 
-   scrollTopBtn.addEventListener('click', () => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-   });
+      scrollTopBtn.addEventListener('click', () => {
+         window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+   }
 }
 
 function filterImages(filter) {
@@ -235,8 +207,7 @@ function filterImages(filter) {
    } else {
       currentImages = images.filter(img => getCategory(img) === filter);
    }
-   currentPage = 1; // Reset pagination
-   loadGallery();
+   loadGalleryFast(); // Reload with new filter - still fast
 }
 
 function openModal(index) {
@@ -244,19 +215,23 @@ function openModal(index) {
    const imageName = currentImages[index];
    const imagePath = `images/FAITH PNG/${imageName}`;
 
-   modalImage.src = imagePath;
-   modalTitle.textContent = formatImageName(imageName);
-   modal.style.display = 'block';
-   document.body.style.overflow = 'hidden';
+   if (modalImage) modalImage.src = imagePath;
+   if (modalTitle) modalTitle.textContent = formatImageName(imageName);
+   if (modal) {
+      modal.style.display = 'block';
+      document.body.style.overflow = 'hidden';
+   }
 
    // Update navigation buttons
-   prevBtn.style.display = index > 0 ? 'block' : 'none';
-   nextBtn.style.display = index < currentImages.length - 1 ? 'block' : 'none';
+   if (prevBtn) prevBtn.style.display = index > 0 ? 'block' : 'none';
+   if (nextBtn) nextBtn.style.display = index < currentImages.length - 1 ? 'block' : 'none';
 }
 
 function closeModal() {
-   modal.style.display = 'none';
-   document.body.style.overflow = 'auto';
+   if (modal) {
+      modal.style.display = 'none';
+      document.body.style.overflow = 'auto';
+   }
 }
 
 function showPrevImage() {
@@ -287,18 +262,18 @@ function downloadImage(imagePath, imageName) {
 function showNotification(message) {
    const notification = document.createElement('div');
    notification.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: linear-gradient(135deg, #2ed573, #1e90ff);
-                color: white;
-                padding: 15px 25px;
-                border-radius: 10px;
-                box-shadow: 0 10px 30px rgba(46, 213, 115, 0.3);
-                z-index: 10000;
-                font-weight: bold;
-                animation: slideInRight 0.5s ease;
-            `;
+       position: fixed;
+       top: 20px;
+       right: 20px;
+       background: linear-gradient(135deg, #2ed573, #1e90ff);
+       color: white;
+       padding: 15px 25px;
+       border-radius: 10px;
+       box-shadow: 0 10px 30px rgba(46, 213, 115, 0.3);
+       z-index: 10000;
+       font-weight: bold;
+       animation: slideInRight 0.5s ease;
+   `;
    notification.textContent = message;
 
    document.body.appendChild(notification);
@@ -306,7 +281,9 @@ function showNotification(message) {
    setTimeout(() => {
       notification.style.animation = 'slideOutRight 0.5s ease';
       setTimeout(() => {
-         document.body.removeChild(notification);
+         if (document.body.contains(notification)) {
+            document.body.removeChild(notification);
+         }
       }, 500);
    }, 3000);
 }
@@ -314,13 +291,13 @@ function showNotification(message) {
 // Add CSS for notification animations
 const style = document.createElement('style');
 style.textContent = `
-            @keyframes slideInRight {
-                from { transform: translateX(100%); opacity: 0; }
-                to { transform: translateX(0); opacity: 1; }
-            }
-            @keyframes slideOutRight {
-                from { transform: translateX(0); opacity: 1; }
-                to { transform: translateX(100%); opacity: 0; }
-            }
-        `;
+   @keyframes slideInRight {
+       from { transform: translateX(100%); opacity: 0; }
+       to { transform: translateX(0); opacity: 1; }
+   }
+   @keyframes slideOutRight {
+       from { transform: translateX(0); opacity: 1; }
+       to { transform: translateX(100%); opacity: 0; }
+   }
+`;
 document.head.appendChild(style);
