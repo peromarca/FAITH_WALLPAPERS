@@ -15,6 +15,7 @@ const images = [
 
 let currentImages = [...images];
 let currentImageIndex = 0;
+let visibleRange = { start: 0, end: 20 }; // Show only 20 images initially for speed
 
 // DOM elements
 const gallery = document.getElementById('gallery');
@@ -31,71 +32,115 @@ const nextBtn = document.getElementById('nextBtn');
 const scrollTopBtn = document.getElementById('scrollTop');
 const totalImagesEl = document.getElementById('totalImages');
 
-// Initialize - FAST VERSION
+// Initialize - ULTRA FAST VERSION
 document.addEventListener('DOMContentLoaded', function () {
-   updateStats();
-   setupEventListeners();
-   loadGalleryFast(); // Load all images immediately
+   // Load everything in optimal order for speed
+   setupEventListeners(); // First - make buttons work
+   updateStats();          // Second - show stats
+   loadGalleryUltraFast(); // Third - load images with optimization
 });
 
 function updateStats() {
    totalImagesEl.textContent = `🎨 ${images.length} Premium Wallpapers Available for Download`;
 }
 
-// FAST LOADING FUNCTION - Load all 100 images at once
-function loadGalleryFast() {
-   loading.style.display = 'block';
+// TURBO LOADING FUNCTION - Virtual scrolling for instant loading
+function loadGalleryUltraFast() {
+   // Hide loading first to make UI responsive immediately
+   loading.style.display = 'none';
 
-   // Clear gallery
+   // Clear gallery fast
    gallery.innerHTML = '';
+
+   // Load only first 20 images for instant display
+   const visibleImages = currentImages.slice(0, 20);
 
    // Create document fragment for better performance
    const fragment = document.createDocumentFragment();
 
-   // Create all gallery items at once
-   currentImages.forEach((image, index) => {
-      const galleryItem = createGalleryItem(image, index);
+   visibleImages.forEach((image, index) => {
+      const galleryItem = createGalleryItemUltraFast(image, index);
       fragment.appendChild(galleryItem);
    });
 
-   // Add all items to gallery at once (faster than individual appends)
+   // Add visible items immediately
    gallery.appendChild(fragment);
 
-   // Hide loading immediately
-   loading.style.display = 'none';
+   // Load more button if there are more images
+   if (currentImages.length > 20) {
+      const loadMoreBtn = document.createElement('button');
+      loadMoreBtn.className = 'load-more-btn';
+      loadMoreBtn.textContent = `📷 Load ${currentImages.length - 20} More Images`;
+      loadMoreBtn.style.cssText = `
+         width: 100%; 
+         padding: 15px; 
+         background: linear-gradient(135deg, #667eea, #764ba2); 
+         color: white; 
+         border: none; 
+         border-radius: 10px; 
+         font-size: 18px; 
+         cursor: pointer; 
+         margin-top: 20px;
+         transition: transform 0.2s;
+      `;
+      loadMoreBtn.onmouseover = () => loadMoreBtn.style.transform = 'scale(1.05)';
+      loadMoreBtn.onmouseout = () => loadMoreBtn.style.transform = 'scale(1)';
+      loadMoreBtn.onclick = loadRemainingImages;
+      gallery.appendChild(loadMoreBtn);
+   }
 
-   // No animations for maximum speed
-   console.log(`✅ Fast loading complete: ${currentImages.length} images loaded`);
+   console.log(`🚀 TURBO loading: ${visibleImages.length} images displayed instantly`);
 }
 
-function createGalleryItem(imageName, index) {
+// Load remaining images when requested
+function loadRemainingImages() {
+   const loadMoreBtn = document.querySelector('.load-more-btn');
+   loadMoreBtn.textContent = 'Loading...';
+   loadMoreBtn.disabled = true;
+
+   // Load remaining images in background
+   setTimeout(() => {
+      const remainingImages = currentImages.slice(20);
+      const fragment = document.createDocumentFragment();
+
+      remainingImages.forEach((image, index) => {
+         const galleryItem = createGalleryItemUltraFast(image, index + 20);
+         fragment.appendChild(galleryItem);
+      });
+
+      // Remove load more button and add remaining images
+      loadMoreBtn.remove();
+      gallery.appendChild(fragment);
+
+      console.log(`✅ All ${currentImages.length} images loaded`);
+   }, 100); // Small delay to show loading state
+}
+
+// Ultra fast version with minimal DOM operations
+function createGalleryItemUltraFast(imageName, index) {
    const item = document.createElement('div');
    item.className = 'gallery-item';
    item.dataset.category = getCategory(imageName);
 
-   const imageTitle = formatImageName(imageName);
    const imagePath = `images/FAITH PNG/${imageName}`;
+   const imageTitle = `FAITH WP #${imageName.replace('wp ', '').replace('.png', '')}`;
 
-   // Minimal HTML for speed
-   item.innerHTML = `
-       <img src="${imagePath}" alt="${imageTitle}" loading="lazy" decoding="async">
-       <div class="gallery-item-info">
-           <h3>${imageTitle}</h3>
-           <p>High Quality PNG • Ready to Download</p>
-           <button class="download-btn" onclick="downloadImage('${imagePath}', '${imageName}')">
-               ⬇️ Download
-           </button>
-       </div>
-   `;
+   // Ultra minimal HTML - no fancy formatting
+   item.innerHTML = `<img src="${imagePath}" alt="${imageTitle}" loading="lazy"><div class="gallery-item-info"><h3>${imageTitle}</h3><p>PNG • Download</p><button class="download-btn" onclick="downloadImage('${imagePath}', '${imageName}')">⬇️</button></div>`;
 
-   // Open modal on click
-   item.addEventListener('click', (e) => {
+   // Single event listener for better performance
+   item.onclick = (e) => {
       if (!e.target.classList.contains('download-btn')) {
          openModal(index);
       }
-   });
+   };
 
    return item;
+}
+
+// Keep original function for compatibility
+function createGalleryItem(imageName, index) {
+   return createGalleryItemUltraFast(imageName, index);
 }
 
 function getCategory(imageName) {
@@ -203,11 +248,11 @@ function setupEventListeners() {
 
 function filterImages(filter) {
    if (filter === 'all') {
-      currentImages = [...images];
+      currentImages = images; // Direct reference instead of copy for speed
    } else {
       currentImages = images.filter(img => getCategory(img) === filter);
    }
-   loadGalleryFast(); // Reload with new filter - still fast
+   loadGalleryUltraFast(); // Ultra fast reload
 }
 
 function openModal(index) {
@@ -288,7 +333,7 @@ function showNotification(message) {
    }, 3000);
 }
 
-// Add CSS for notification animations
+// Add CSS for notification animations + preload optimization
 const style = document.createElement('style');
 style.textContent = `
    @keyframes slideInRight {
@@ -299,5 +344,22 @@ style.textContent = `
        from { transform: translateX(0); opacity: 1; }
        to { transform: translateX(100%); opacity: 0; }
    }
+   /* Optimize image loading */
+   .gallery-item img {
+       content-visibility: auto;
+       contain-intrinsic-size: 300px 250px;
+   }
 `;
 document.head.appendChild(style);
+
+// Preload first few images for instant display
+function preloadFirstImages() {
+   const firstImages = images.slice(0, 6); // Preload first 6 images
+   firstImages.forEach(imageName => {
+      const img = new Image();
+      img.src = `images/FAITH PNG/${imageName}`;
+   });
+}
+
+// Start preloading immediately
+preloadFirstImages();
